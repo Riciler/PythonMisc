@@ -17,6 +17,8 @@ dos deltas para fins de inicialização e preenchimento das matrizes
 #%%imports
 
 import numpy as np
+import matplotlib.pyplot as plt
+from scipy.misc import derivative
 
 #%% Funções construtoras das matrizes
 
@@ -38,10 +40,7 @@ def matrixbdpa(n,h=0.001):
   arr = np.zeros((t,t))
   for e in range(1,int(t+1)):
       for m in range(1,int(t+1)):
-          if m==1:
-              arr[e-1,m-1] = 2*e   #TODO: Ajeitar esta matriz com o novo PDF
-          else:
-              arr[e-1,m-1] = (2*((e*h)**(2*(m-1)))/np.math.factorial(2*(m-1)))
+          arr[e-1,m-1] = (2*((e*h)**(2*(m)))/np.math.factorial(2*(m)))
   return arr
 
 #%% Funções construtoras dos deltas
@@ -52,7 +51,7 @@ def deltpa(n,func,x0,h=0.001):
   l = []
   t = (n-1)/2           #Ambas funções delta utilizam o mesmo tamanho de 't' termos
   for e in range(1,int(t+1)):
-      dlt = func(x0+(e*h)) + func(x0-(e*h))         #Este loop calcula o delta para cada par simétrico e o insere na lista l
+      dlt = func(x0+(e*h)) + func(x0-(e*h)) - 2*func(x0)        #Este loop calcula o delta para cada par simétrico e o insere na lista l
       l.append(dlt)
   l = np.array(l)
   l = l.reshape((int(t),1))    #Aqui a lista é transformada em uma array posteriormente transposta
@@ -78,10 +77,10 @@ def derivada(orde,func,x0,n,h=0.001):
   ponto a ser calculada a derivada (x0) e 'n' pontos a ser utilizados no calculo'''
   if type(orde)!=int and type(orde)!=float:
     return(print('TypeError: a ordem precisa ser int ou float'))                       #Aqui um pequeno controle de erros (nem de perto a forma mais eficiente)
-  if type(x0)!=int and type(x0)!=float:
-    return(print('TypeError: x0 precisa ser int ou float'))
-  if ((n%2)==0) or type(n)!=int:
-    return(print('O número n de pontos deve ser OBRIGATORIAMENTE ímpar e inteiro'))
+  #if type(x0)!=int and type(x0)!=float:                                               #nem muito funcional
+  #  return(print('TypeError: x0 precisa ser int ou float'))
+  #if ((n%2)==0): #or type(n)!=int:
+  # return(print('O número n de pontos deve ser OBRIGATORIAMENTE ímpar e inteiro'))
   if ((orde%2)==0):            #Confere se n é ímpar
     dlt = deltpa(n, func, x0)
     mat = matrixbdpa(n)        #Aqui as duas funções anteriormente construídas são chamadas
@@ -105,8 +104,3 @@ def func1(x):
 
 def func2(x):
     return x**5
-
-
-
-derivada(3,func1,2,5)
-
